@@ -8,6 +8,8 @@ services:
       - "9042:9042"
     volumes:
       - cassandra-data-node1:/var/lib/cassandra/data
+    networks:
+      - cassandra_network
 
   cassandra-node2:
     image: cassandra:latest
@@ -16,6 +18,32 @@ services:
       - "9043:9042"
     volumes:
       - cassandra-data-node2:/var/lib/cassandra/data
+    networks:
+      - cassandra_network
+
+  fastapi-app:
+    image: image_fastapi
+    container_name: fastapi-app
+    ports:
+      - "8502:8502"
+    depends_on:
+      - cassandra-node1
+    networks:
+      - cassandra_network
+
+  streamlit-app:
+    image: image_streamlit
+    container_name: streamlit-app
+    ports:
+      - "8501:8501"
+    depends_on:
+      - fastapi-app
+    networks:
+      - cassandra_network
+
+networks:
+  cassandra_network:
+
 
 volumes:
   cassandra-data-node1:

@@ -3,7 +3,7 @@ import streamlit as st
 import requests
 
 def get_restaurant_info(restaurant_id):
-    response = requests.get(f"http://localhost:8502/restaurant/{restaurant_id}")
+    response = requests.get(f"http://fastapi-app:8502/restaurant/{restaurant_id}")
     if response.status_code == 200:
         restaurant_data = response.json()
         st.write(restaurant_data)
@@ -12,7 +12,7 @@ def get_restaurant_info(restaurant_id):
 
 def search_restaurants_by_cuisine(cuisine_type):
     try:
-        response = requests.get(f"http://localhost:8502/restaurants-by-cuisine/{cuisine_type}")
+        response = requests.get(f"http://fastapi-app:8502/restaurants-by-cuisine/{cuisine_type}")
         if response.status_code == 200:
             restaurants = response.json()
             if restaurants:
@@ -24,7 +24,7 @@ def search_restaurants_by_cuisine(cuisine_type):
     except requests.exceptions.ConnectionError:
         st.write("Erreur de connexion à l'API FastAPI")
 
-response = requests.get("http://localhost:8502/cuisine-types")
+response = requests.get("http://fastapi-app:8502/cuisine-types")
 if response.status_code == 200:
     cuisine_type_list = list(set(response.json())) # pas de doublon
     cuisine_type_list.sort() # ordre alphabétique
@@ -32,7 +32,7 @@ else:
     cuisine_type_list = []
 
 def get_inspections_and_count(restaurant_id_inspection):
-    response = requests.get(f"http://localhost:8502/restaurant-inspections/{restaurant_id_inspection}")
+    response = requests.get(f"http://fastapi-app:8502/restaurant-inspections/{restaurant_id_inspection}")
     if response.status_code == 200:
         inspection_data = response.json()
         inspection_count = inspection_data["inspection_count"]
@@ -50,7 +50,7 @@ def get_inspections_and_count(restaurant_id_inspection):
         st.write("Restaurant non trouvé ou aucune inspection trouvée")
 
 def get_top_restaurants_by_grade(grade):
-    response = requests.get(f"http://localhost:8502/restaurants-by-grade/{grade}")
+    response = requests.get(f"http://fastapi-app:8502/restaurants-by-grade/{grade}")
     if response.status_code == 200:
         restaurant_names = response.json()
         if restaurant_names:
@@ -62,7 +62,7 @@ def get_top_restaurants_by_grade(grade):
     else:
         st.write("Erreur lors de la récupération des données")
 
-response_grade = requests.get("http://localhost:8502/grade-types")
+response_grade = requests.get("http://fastapi-app:8502/grade-types")
 
 if response_grade.status_code == 200:
     grade_type_list = list(set(response_grade.json()))
@@ -73,11 +73,11 @@ else:
 st.title("Restaurant API")
 
 st.markdown("Les 5 premiers restaurants")
-response = requests.get(f"http://localhost:8502/first-five-restaurants")
+response = requests.get(f"http://fastapi-app:8502/first-five-restaurants")
 if response.status_code == 200:
     first_five_restaurants = response.json()
     if first_five_restaurants:
-            df = pd.DataFrame(first_five_restaurants)
+            df = pd.DataFrame(first_five_restaurants, columns=["id", "borough", "buildingnum", "cuisinetype", "name", "phone", "street", "zipcode"])
             st.table(df)
     else:
         st.write("Aucun restaurant trouvé")
